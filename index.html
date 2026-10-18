@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TayakiFlix - Streaming</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Netflix Sans', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: #141414;
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header */
+    header {
+      background: linear-gradient(180deg, #000 0%, rgba(0,0,0,0.7) 100%);
+      padding: 16px 48px;
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      flex-wrap: wrap;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      font-size: 2rem;
+      font-weight: 900;
+      letter-spacing: -1px;
+      color: #e50914;
+      cursor: pointer;
+      user-select: none;
+      transition: transform 0.2s;
+    }
+
+    .logo span {
+      color: #fff;
+    }
+
+    .logo:hover {
+      transform: scale(1.02);
+    }
+
+    nav {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+    }
+
+    nav a {
+      color: #e5e5e5;
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: color 0.2s;
+      cursor: pointer;
+    }
+
+    nav a:hover, nav a.active {
+      color: #fff;
+    }
+
+    .admin-link {
+      margin-left: auto;
+      background: #e50914;
+      padding: 8px 16px;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      transition: background 0.2s;
+    }
+
+    .admin-link:hover {
+      background: #f6121d !important;
+    }
+
+    /* Container principal */
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 32px 48px;
+      flex: 1;
+      width: 100%;
+    }
+
+    /* Página inicial - catálogo */
+    .catalog h2 {
+      font-size: 1.5rem;
+      margin-bottom: 24px;
+      font-weight: 500;
+      color: #e5e5e5;
+    }
+
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 24px;
+    }
+
+    .video-card {
+      background: #1f1f1f;
+      border-radius: 6px;
+      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+
+    .video-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.6);
+    }
+
+    .video-thumb {
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: #2a2a2a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #666;
+      font-size: 2.5rem;
+      font-weight: bold;
+      background-size: cover;
+      background-position: center;
+    }
+
+    .video-info {
+      padding: 14px 16px 16px;
+    }
+
+    .video-info h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .video-info p {
+      font-size: 0.85rem;
+      color: #aaa;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .server-badge {
+      display: inline-block;
+      background: #333;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: #e5e5e5;
+      text-transform: uppercase;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 80px 20px;
+      color: #666;
+      font-size: 1.2rem;
+    }
+
+    .empty-state a {
+      color: #e50914;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    /* Página de assistir */
+    .watch-container {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .back-btn {
+      background: #333;
+      border: none;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      align-self: flex-start;
+      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .back-btn:hover {
+      background: #444;
+    }
+
+    .player-wrapper {
+      background: #000;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.8);
+      width: 100%;
+      max-width: 960px;
+      margin: 0 auto;
+      aspect-ratio: 16/9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .player-wrapper iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .watch-info {
+      max-width: 960px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .watch-info h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .watch-meta {
+      display: flex;
+      gap: 16px;
+      color: #aaa;
+      font-size: 0.95rem;
+      flex-wrap: wrap;
+    }
+
+    /* Página admin/CMS */
+    .admin-panel h2 {
+      font-size: 1.8rem;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .admin-panel .subhead {
+      color: #aaa;
+      margin-bottom: 32px;
+      font-size: 0.95rem;
+    }
+
+    .form-card {
+      background: #1f1f1f;
+      border-radius: 8px;
+      padding: 28px;
+      margin-bottom: 40px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+    }
+
+    .form-card h3 {
+      font-size: 1.2rem;
+      margin-bottom: 20px;
+      font-weight: 600;
+      color: #e5e5e5;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group.full-width {
+      grid-column: 1 / -1;
+    }
+
+    .form-group label {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #bbb;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-group input, .form-group select, .form-group textarea {
+      background: #2a2a2a;
+      border: 1px solid #444;
+      color: #fff;
+      padding: 12px 14px;
+      border-radius: 4px;
+      font-size: 0.95rem;
+      transition: border-color 0.2s;
+      font-family: inherit;
+    }
+
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+      outline: none;
+      border-color: #e50914;
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .btn {
+      background: #e50914;
+      color: #fff;
+      border: none;
+      padding: 12px 28px;
+      border-radius: 4px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn:hover {
+      background: #f6121d;
+    }
+
+    .btn-secondary {
+      background: #333;
+    }
+
+    .btn-secondary:hover {
+      background: #444;
+    }
+
+    .btn-danger {
+      background: #b20710;
+    }
+
+    .btn-danger:hover {
+      background: #d60812;
+    }
+
+    .btn-small {
+      padding: 6px 14px;
+      font-size: 0.8rem;
+    }
+
+    .table-container {
+      overflow-x: auto;
+      background: #1a1a1a;
+      border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 800px;
+    }
+
+    th {
+      text-align: left;
+      padding: 16px 20px;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #888;
+      background: #222;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 16px 20px;
+      border-top: 1px solid #2a2a2a;
+      font-size: 0.9rem;
+      color: #ddd;
+      vertical-align: middle;
+    }
+
+    tr:hover td {
+      background: #222;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .status-msg {
+      padding: 12px 20px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      font-weight: 500;
+      font-size: 0.95rem;
+    }
+
+    .status-success {
+      background: #1b5e20;
+      color: #a5d6a7;
+      border-left: 4px solid #4caf50;
+    }
+
+    .status-error {
+      background: #b71c1c;
+      color: #ef9a9a;
+      border-left: 4px solid #f44336;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 32px 48px;
+      color: #666;
+      font-size: 0.85rem;
+      border-top: 1px solid #222;
+      margin-top: auto;
+    }
+
+    /* Responsivo */
+    @media (max-width: 768px) {
+      header {
+        padding: 14px 20px;
+        gap: 16px;
+      }
+
+      .logo {
+        font-size: 1.5rem;
+      }
+
+      nav {
+        gap: 16px;
+      }
+
+      nav a {
+        font-size: 0.85rem;
+      }
+
+      .admin-link {
+        padding: 6px 12px;
+        font-size: 0.75rem;
+      }
+
+      .container {
+        padding: 20px 16px;
+      }
+
+      .video-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 16px;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .watch-info h1 {
+        font-size: 1.4rem;
+      }
+
+      .player-wrapper iframe {
+        min-height: 200px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .video-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    /* Animação de carregamento */
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #333;
+      border-top-color: #e50914;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 40px auto;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo" onclick="navigateTo('home')">TAYAKI<span>FLIX</span></div>
+    <nav>
+      <a onclick="navigateTo('home')" id="nav-home" class="active">Início</a>
+      <a onclick="navigateTo('admin')" id="nav-admin">Admin/CMS</a>
+    </nav>
+    <a class="admin-link" onclick="navigateTo('admin')">+ Adicionar</a>
+  </header>
+
+  <main id="app" class="container">
+    <!-- Conteúdo renderizado via JS -->
+    <div class="spinner"></div>
+  </main>
+
+  <footer>
+    <p>© 2025 TayakiFlix — Todos os direitos reservados. Conteúdo demonstrativo.</p>
+  </footer>
+
+  <script>
+    // ------------------------------------------------------------
+    // DADOS — Armazenados no localStorage
+    // ------------------------------------------------------------
+    const STORAGE_KEY = 'tayakiflix_videos';
+
+    // Vídeos iniciais (com base no exemplo fornecido)
+    const DEFAULT_VIDEOS = [
+      {
+        id: '1',
+        title: 'AVTROSTERFGST01EP01',
+        description: 'Episódio 01 — Série de demonstração',
+        server: 'RCServer28',
+        subfolder: 'ondemand',
+        vid: 'AVTROSTERFGST01EP01',
+        iframeSrc: '//%72%65%64%65%63%61%6E%61%69%73%2E%62%79/player3/server.php?server=RCServer28&subfolder=ondemand&vid=AVTROSTERFGST01EP01',
+        thumb: '🎬',
+        createdAt: Date.now()
+      },
+      {
+        id: '2',
+        title: 'Exemplo: Outro Vídeo',
+        description: 'Vídeo de exemplo para testar o CMS',
+        server: 'RCServer28',
+        subfolder: 'ondemand',
+        vid: 'EXEMPLO002',
+        iframeSrc: '//%72%65%64%65%63%61%6E%61%69%73%2E%62%79/player3/server.php?server=RCServer28&subfolder=ondemand&vid=EXEMPLO002',
+        thumb: '📺',
+        createdAt: Date.now() - 100000
+      }
+    ];
+
+    // Carrega os vídeos do localStorage ou usa os padrões
+    function loadVideos() {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+          return JSON.parse(stored);
+        }
+      } catch (e) {
+        console.warn('Erro ao carregar vídeos:', e);
+      }
+      // Se não houver nada salvo, salva os padrões
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_VIDEOS));
+      return [...DEFAULT_VIDEOS];
+    }
+
+    function saveVideos(videos) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(videos));
+    }
+
+    // Estado global
+    let videos = loadVideos();
+    let currentPage = 'home'; // 'home' | 'watch' | 'admin'
+    let currentVideoId = null;
+
+    // ------------------------------------------------------------
+    // NAVEGAÇÃO
+    // ------------------------------------------------------------
+    function navigateTo(page, videoId = null) {
+      currentPage = page;
+      if (videoId) currentVideoId = videoId;
+
+      // Atualiza classes ativas do nav
+      document.getElementById('nav-home').classList.toggle('active', page === 'home');
+      document.getElementById('nav-admin').classList.toggle('active', page === 'admin');
+
+      renderApp();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ------------------------------------------------------------
+    // RENDERIZAÇÃO
+    // ------------------------------------------------------------
+    function renderApp() {
+      const app = document.getElementById('app');
+      if (currentPage === 'home') {
+        app.innerHTML = renderHome();
+        attachHomeEvents();
+      } else if (currentPage === 'watch') {
+        app.innerHTML = renderWatch();
+        attachWatchEvents();
+      } else if (currentPage === 'admin') {
+        app.innerHTML = renderAdmin();
+        attachAdminEvents();
+      }
+    }
+
+    // ----- PÁGINA INICIAL (CATÁLOGO) -----
+    function renderHome() {
+      if (videos.length === 0) {
+        return `
+          <div class="catalog">
+            <h2>Catálogo</h2>
+            <div class="empty-state">
+              Nenhum vídeo cadastrado ainda.<br><br>
+              <a onclick="navigateTo('admin')">Vá para o Admin/CMS</a> para adicionar o primeiro vídeo.
+            </div>
+          </div>
+        `;
+      }
+
+      const cards = videos.map(v => `
+        <div class="video-card" data-id="${v.id}">
+          <div class="video-thumb" style="background-image: url('${v.thumbImage || ''}');">
+            ${v.thumbImage ? '' : (v.thumb || '🎬')}
+          </div>
+          <div class="video-info">
+            <h3>${escapeHtml(v.title)}</h3>
+            <p>
+              <span class="server-badge">${escapeHtml(v.server)}</span>
+              ${v.subfolder ? `<span>${escapeHtml(v.subfolder)}</span>` : ''}
+            </p>
+            <p style="font-size:0.8rem; color:#777; margin-top:6px;">${escapeHtml(v.description || '')}</p>
+          </div>
+        </div>
+      `).join('');
+
+      return `
+        <div class="catalog">
+          <h2>Catálogo — ${videos.length} vídeo${videos.length !== 1 ? 's' : ''}</h2>
+          <div class="video-grid">
+            ${cards}
+          </div>
+        </div>
+      `;
+    }
+
+    function attachHomeEvents() {
+      document.querySelectorAll('.video-card').forEach(card => {
+        card.addEventListener('click', () => {
+          const id = card.dataset.id;
+          navigateTo('watch', id);
+        });
+      });
+    }
+
+    // ----- PÁGINA ASSISTIR -----
+    function renderWatch() {
+      const video = videos.find(v => v.id === currentVideoId);
+      if (!video) {
+        return `
+          <div class="watch-container">
+            <button class="back-btn" onclick="navigateTo('home')">← Voltar</button>
+            <div class="empty-state">Vídeo não encontrado.</div>
+          </div>
+        `;
+      }
+
+      // Usa o iframeSrc exato fornecido (ou monta a partir dos campos)
+      const iframeSrc = video.iframeSrc || buildIframeSrc(video);
+
+      return `
+        <div class="watch-container">
+          <button class="back-btn" onclick="navigateTo('home')">← Voltar ao catálogo</button>
+          <div class="player-wrapper">
+            <iframe 
+              name="Player"
+              src="${iframeSrc}"
+              frameborder="0"
+              height="400"
+              scrolling="no"
+              width="640"
+              allow="encrypted-media"
+              allowFullScreen>
+            </iframe>
+          </div>
+          <div class="watch-info">
+            <h1>${escapeHtml(video.title)}</h1>
+            <div class="watch-meta">
+              <span>Servidor: <strong>${escapeHtml(video.server)}</strong></span>
+              <span>Pasta: <strong>${escapeHtml(video.subfolder || '—')}</strong></span>
+              <span>ID: <strong>${escapeHtml(video.vid)}</strong></span>
+            </div>
+            <p style="margin-top:16px; color:#bbb; line-height:1.6;">${escapeHtml(video.description || 'Sem descrição.')}</p>
+          </div>
+        </div>
+      `;
+    }
+
+    function buildIframeSrc(video) {
+      // Constrói a URL no mesmo formato do exemplo
+      const base = '//%72%65%64%65%63%61%6E%61%69%73%2E%62%79/player3/server.php';
+      const params = new URLSearchParams({
+        server: video.server,
+        subfolder: video.subfolder || 'ondemand',
+        vid: video.vid
+      });
+      return `${base}?${params.toString()}`;
+    }
+
+    function attachWatchEvents() {
+      // Nada extra necessário
+    }
+
+    // ----- PÁGINA ADMIN / CMS -----
+    function renderAdmin() {
+      const list = videos.map(v => `
+        <tr>
+          <td>${escapeHtml(v.title)}</td>
+          <td>${escapeHtml(v.server)}</td>
+          <td>${escapeHtml(v.subfolder || '—')}</td>
+          <td>${escapeHtml(v.vid)}</td>
+          <td>
+            <div class="actions">
+              <button class="btn btn-secondary btn-small" onclick="editVideo('${v.id}')">Editar</button>
+              <button class="btn btn-danger btn-small" onclick="deleteVideo('${v.id}')">Excluir</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+
+      return `
+        <div class="admin-panel">
+          <h2>Admin / CMS</h2>
+          <p class="subhead">Gerencie o catálogo de vídeos do TayakiFlix</p>
+
+          <div id="admin-status"></div>
+
+          <div class="form-card" id="form-card">
+            <h3 id="form-title">Adicionar Novo Vídeo</h3>
+            <form id="video-form">
+              <input type="hidden" id="edit-id" value="">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="title">Título *</label>
+                  <input type="text" id="title" required placeholder="Ex: AVTROSTERFGST01EP01">
+                </div>
+                <div class="form-group">
+                  <label for="server">Servidor *</label>
+                  <input type="text" id="server" required placeholder="Ex: RCServer28">
+                </div>
+                <div class="form-group">
+                  <label for="subfolder">Subfolder</label>
+                  <input type="text" id="subfolder" placeholder="Ex: ondemand" value="ondemand">
+                </div>
+                <div class="form-group">
+                  <label for="vid">ID do Vídeo (vid) *</label>
+                  <input type="text" id="vid" required placeholder="Ex: AVTROSTERFGST01EP01">
+                </div>
+                <div class="form-group full-width">
+                  <label for="description">Descrição</label>
+                  <textarea id="description" placeholder="Breve descrição do vídeo..."></textarea>
+                </div>
+                <div class="form-group">
+                  <label for="thumb">Ícone (emoji)</label>
+                  <input type="text" id="thumb" placeholder="Ex: 🎬" maxlength="4" value="🎬">
+                </div>
+                <div class="form-group">
+                  <label for="thumbImage">URL da Thumb (opcional)</label>
+                  <input type="text" id="thumbImage" placeholder="https://...">
+                </div>
+              </div>
+              <div style="margin-top:24px; display:flex; gap:12px;">
+                <button type="submit" class="btn" id="submit-btn">Adicionar Vídeo</button>
+                <button type="button" class="btn btn-secondary" id="cancel-edit" style="display:none;" onclick="cancelEdit()">Cancelar Edição</button>
+              </div>
+            </form>
+          </div>
+
+          <h3 style="margin-bottom:16px; font-weight:600;">Vídeos Cadastrados (${videos.length})</h3>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Título</th>
+                  <th>Servidor</th>
+                  <th>Subfolder</th>
+                  <th>ID (vid)</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${list || '<tr><td colspan="5" style="text-align:center; color:#666; padding:40px;">Nenhum vídeo cadastrado.</td></tr>'}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function attachAdminEvents() {
+      const form = document.getElementById('video-form');
+      if (form) {
+        form.addEventListener('submit', handleFormSubmit);
+      }
+    }
+
+    // ------------------------------------------------------------
+    // AÇÕES DO CMS
+    // ------------------------------------------------------------
+    function handleFormSubmit(e) {
+      e.preventDefault();
+
+      const editId = document.getElementById('edit-id').value;
+      const title = document.getElementById('title').value.trim();
+      const server = document.getElementById('server').value.trim();
+      const subfolder = document.getElementById('subfolder').value.trim() || 'ondemand';
+      const vid = document.getElementById('vid').value.trim();
+      const description = document.getElementById('description').value.trim();
+      const thumb = document.getElementById('thumb').value.trim() || '🎬';
+      const thumbImage = document.getElementById('thumbImage').value.trim();
+
+      if (!title || !server || !vid) {
+        showStatus('Preencha os campos obrigatórios: Título, Servidor e ID do Vídeo.', 'error');
+        return;
+      }
+
+      // Constrói a URL do iframe no formato exato do exemplo
+      const iframeSrc = buildIframeSrc({ server, subfolder, vid });
+
+      if (editId) {
+        // Editar existente
+        const index = videos.findIndex(v => v.id === editId);
+        if (index !== -1) {
+          videos[index] = {
+            ...videos[index],
+            title, server, subfolder, vid, description, thumb, thumbImage, iframeSrc
+          };
+          saveVideos(videos);
+          showStatus('Vídeo atualizado com sucesso!', 'success');
+          cancelEdit();
+          renderApp();
+        } else {
+          showStatus('Vídeo não encontrado para edição.', 'error');
+        }
+      } else {
+        // Adicionar novo
+        const newVideo = {
+          id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
+          title, server, subfolder, vid, description, thumb, thumbImage, iframeSrc,
+          createdAt: Date.now()
+        };
+        videos.push(newVideo);
+        saveVideos(videos);
+        showStatus('Vídeo adicionado com sucesso!', 'success');
+        resetForm();
+        renderApp();
+      }
+    }
+
+    function editVideo(id) {
+      const video = videos.find(v => v.id === id);
+      if (!video) return;
+
+      document.getElementById('edit-id').value = video.id;
+      document.getElementById('title').value = video.title;
+      document.getElementById('server').value = video.server;
+      document.getElementById('subfolder').value = video.subfolder || 'ondemand';
+      document.getElementById('vid').value = video.vid;
+      document.getElementById('description').value = video.description || '';
+      document.getElementById('thumb').value = video.thumb || '🎬';
+      document.getElementById('thumbImage').value = video.thumbImage || '';
+
+      document.getElementById('form-title').textContent = 'Editar Vídeo';
+      document.getElementById('submit-btn').textContent = 'Salvar Alterações';
+      document.getElementById('cancel-edit').style.display = 'inline-block';
+
+      // Scroll até o formulário
+      document.getElementById('form-card').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function cancelEdit() {
+      document.getElementById('edit-id').value = '';
+      document.getElementById('form-title').textContent = 'Adicionar Novo Vídeo';
+      document.getElementById('submit-btn').textContent = 'Adicionar Vídeo';
+      document.getElementById('cancel-edit').style.display = 'none';
+      resetForm();
+    }
+
+    function resetForm() {
+      document.getElementById('video-form').reset();
+      document.getElementById('subfolder').value = 'ondemand';
+      document.getElementById('thumb').value = '🎬';
+    }
+
+    function deleteVideo(id) {
+      if (!confirm('Tem certeza que deseja excluir este vídeo?')) return;
+
+      videos = videos.filter(v => v.id !== id);
+      saveVideos(videos);
+
+      // Se o vídeo excluído era o atual na página de assistir, volta para home
+      if (currentVideoId === id) {
+        currentVideoId = null;
+        navigateTo('home');
+      } else {
+        renderApp();
+      }
+      showStatus('Vídeo excluído com sucesso.', 'success');
+    }
+
+    function showStatus(message, type) {
+      const container = document.getElementById('admin-status');
+      if (!container) return;
+      container.innerHTML = `<div class="status-msg status-${type}">${escapeHtml(message)}</div>`;
+      setTimeout(() => {
+        if (container) container.innerHTML = '';
+      }, 4000);
+    }
+
+    // ------------------------------------------------------------
+    // UTILITÁRIOS
+    // ------------------------------------------------------------
+    function escapeHtml(text) {
+      if (!text) return '';
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // ------------------------------------------------------------
+    // INICIALIZAÇÃO
+    // ------------------------------------------------------------
+    // Garante que os vídeos estão carregados
+    videos = loadVideos();
+    renderApp();
+
+    // Expõe funções globalmente para os eventos inline
+    window.navigateTo = navigateTo;
+    window.editVideo = editVideo;
+    window.deleteVideo = deleteVideo;
+    window.cancelEdit = cancelEdit;
+  </script>
+</body>
+</html>

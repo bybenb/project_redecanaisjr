@@ -1,0 +1,12 @@
+redecanais-jr/
+├── app/
+│   ├── __init__.py
+│   ├── config.py          # Configurações (env vars)
+│   ├── database.py        # Conexão com o Neon
+│   ├── models.py          # Modelos SQLAlchemy
+│   ├── schemas.py         # Schemas Pydantic
+│   ├── security.py        # Hash de senha + JWT
+│   └── main.py            # App FastAPI
+├── .env
+├── requirements.txt
+└── alembic.ini            # (mais tarde)
