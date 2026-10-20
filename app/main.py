@@ -13,10 +13,10 @@ from app.routers import admin, auth
 async def lifespan(app: FastAPI):
     async with engine.connect() as conn:
         await conn.execute(text("SELECT 1"))
-    print(f"✅ Conectado ao banco ({settings.APP_NAME}).")
+    print(f"Conectado ao banco ({settings.APP_NAME}).")
     yield
     await engine.dispose()
-    print("🔌 Conexão com o banco encerrada.")
+    print(" Conexão com o banco encerrada.")
 
 
 app = FastAPI(
