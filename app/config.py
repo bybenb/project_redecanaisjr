@@ -2,7 +2,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    # Banco de dados (Neon.tech)
+    
     DATABASE_URL: str
     DB_ECHO: bool = False
 
