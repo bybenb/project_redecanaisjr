@@ -27,11 +27,56 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"] if settings.APP_ENV == "development" else ["https://redecanaisjr.com"],
+    allow_origins=["*"] if settings.APP_ENV == "development" else ["https://redecanaisjr.site"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+
+
+def custom_openapi():
+    if app.openapi_schema:
+        return app.openapi_schema
+
+    openapi_schema = get_openapi(
+        title=app.title,
+        version=app.version,
+        openapi_version=app.openapi_version,
+        description=app.description,
+        routes=app.routes,
+    )
+
+    openapi_schema["components"]["securitySchemes"] = {
+        "BearerAuth": {
+            "type": "http",
+            "scheme": "bearer",
+            "bearerFormat": "JWT",
+        }
+    }
+
+    for path in openapi_schema["paths"].values():
+        for method in path.values():
+            if "security" in method:
+                method["security"] = [{"BearerAuth": []}]
+
+    app.openapi_schema = openapi_schema
+    return app.openapi_schema
+
+
+app.openapi = custom_openapi
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -42,3 +87,5 @@ app.include_router(admin.router)
 @app.get("/health", tags=["Sistema"])
 async def health_check():
     return {"status": "ok", "app": settings.APP_NAME, "env": settings.APP_ENV}
+
+
