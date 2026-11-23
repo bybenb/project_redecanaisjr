@@ -1,8 +1,0 @@
-.env
-
-schema.sql
-
-
-*.pyc
-__pycache__/
-__pycache__

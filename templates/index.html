@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#202020">
+<title>RedeCanais Jr</title>
+<link rel="icon" href="/static/images/favicon.ico">
+<link rel="apple-touch-icon" href="/static/images/apple-touch-icon.png">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<header class="topbar">
+  <button class="menu-toggle" aria-label="Abrir menu" onclick="document.body.classList.toggle('menu-aberto')">
+    <i class="fa-solid fa-bars"></i>
+  </button>
+  <a class="brand" href="/" aria-label="RedeCanais Jr - início">
+    <img src="/static/images/logo.webp" alt="RedeCanais Jr">
+  </a>
+  <nav class="nav-links" id="navLinks">
+    <a href="/" class="ativo"><i class="fa-solid fa-house"></i><span>Início</span></a>
+    <a href="#" onclick="mostrarFavoritos(); return false;"><i class="fa-regular fa-heart"></i><span>Favoritos</span></a>
+  </nav>
+  <label class="busca-box">
+    <input type="search" id="inputBusca" placeholder="Buscar filmes e séries..." oninput="buscar()">
+    <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+  </label>
+  <div class="user-area" id="userArea">
+    <button class="btn-outline" onclick="abrirModal('login')">Entrar</button>
+    <button class="btn-primary" onclick="abrirModal('registrar')">Criar conta</button>
+  </div>
+</header>
+
+<main>
+  <section class="hero" id="hero">
+    <div class="hero-overlay"></div>
+    <div class="hero-content" id="heroContent"></div>
+  </section>
+
+  <section class="catalogo">
+    <div class="catalogo-topo">
+      <div>
+        <p class="eyebrow"><span></span> SUA PRÓXIMA HISTÓRIA COMEÇA AQUI</p>
+        <h2 id="tituloSecao">Todos os títulos</h2>
+      </div>
+      <p class="catalogo-nota"><i class="fa-solid fa-circle-play"></i> Descubra algo novo para assistir</p>
+    </div>
+    <nav class="categorias" id="categorias" aria-label="Filtrar por categoria"></nav>
+    <div class="grid-filmes" id="gridFilmes"></div>
+    <div id="mensagemVazia" class="vazia" style="display:none;">
+      <i class="fa-solid fa-film"></i>
+      <p>Nenhum conteúdo encontrado.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <a href="/" class="footer-brand">RedeCanais <span>Jr</span></a>
+  <p>Um catálogo para encontrar sua próxima história favorita.</p>
+</footer>
+
+<div class="modal-overlay" id="modalAuth" onclick="fecharModalAuth(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <button class="fechar" aria-label="Fechar" onclick="fecharModalAuth()"><i class="fa-solid fa-xmark"></i></button>
+    <h2 id="authTitulo">Entrar</h2>
+    <form id="formAuth" onsubmit="enviarAuth(event)">
+      <div class="campo" id="campoNome" style="display:none;">
+        <label for="inpNome">Nome</label>
+        <input type="text" id="inpNome" placeholder="Seu nome">
+      </div>
+      <div class="campo">
+        <label for="inpEmail">Email</label>
+        <input type="email" id="inpEmail" placeholder="voce@email.com" required>
+      </div>
+      <div class="campo">
+        <label for="inpSenha">Senha</label>
+        <input type="password" id="inpSenha" placeholder="Sua senha" required minlength="4">
+      </div>
+      <p class="erro-msg" id="authErro"></p>
+      <button type="submit" class="btn-primary full" id="btnAuth">Entrar</button>
+    </form>
+    <p class="trocar-modo" id="trocarModo"></p>
+  </div>
+</div>
+<script src="/static/js/app.js"></script>
+</body>
+</html>

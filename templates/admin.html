@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RedeCanais Jr — Painel Admin</title>
+<link rel="icon" href="/static/images/favicon.ico">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="/static/css/admin.css">
+</head>
+<body>
+
+<!-- ============ SIDEBAR ============ -->
+<aside class="sidebar">
+  <a class="logo" href="/" aria-label="RedeCanais Jr">
+    <img src="/static/images/logo.webp" alt="RedeCanais Jr"><small>Admin</small>
+  </a>
+  <nav>
+    <a href="#dashboard" class="ativo" data-sec="dashboard"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+    <a href="#conteudos" data-sec="conteudos"><i class="fa-solid fa-film"></i> Conteúdos</a>
+    <a href="#dominios" data-sec="dominios"><i class="fa-solid fa-link"></i> Trocar domínio</a>
+    <a href="#usuarios" data-sec="usuarios"><i class="fa-solid fa-users"></i> Usuários</a>
+  </nav>
+  <div class="rodape">
+    <span id="nomeAdmin"><i class="fa-regular fa-user"></i></span>
+    <button onclick="logoutAdmin()"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sair</button>
+  </div>
+</aside>
+
+<!-- ============ MAIN ============ -->
+<main class="main">
+
+  <!-- DASHBOARD -->
+  <section id="sec-dashboard" class="sec ativa">
+    <h1><i class="fa-solid fa-chart-pie"></i> Dashboard</h1>
+    <div class="cards" id="cardsStats"></div>
+    <div class="atalhos">
+      <button class="atalho" onclick="irPara('conteudos'); novoConteudo()"><i class="fa-solid fa-plus"></i> Novo conteúdo</button>
+      <button class="atalho" onclick="irPara('dominios')"><i class="fa-solid fa-link"></i> Trocar domínio</button>
+      <button class="atalho" onclick="window.open('/','_blank')"><i class="fa-solid fa-arrow-up-right-from-square"></i> Ver site</button>
+    </div>
+  </section>
+
+  <!-- CONTEÚDOS -->
+  <section id="sec-conteudos" class="sec">
+    <div class="sec-header">
+      <h1><i class="fa-solid fa-film"></i> Conteúdos</h1>
+      <div class="acoes">
+        <input type="text" id="buscaConteudo" placeholder="Buscar por título ou URL..."
+               oninput="filtrarConteudos()">
+        <button class="btn-primary" onclick="novoConteudo()"><i class="fa-solid fa-plus"></i> Novo</button>
+      </div>
+    </div>
+    <div class="tabela-wrap">
+      <table id="tabelaConteudos">
+        <thead>
+          <tr>
+            <th>ID</th><th>Capa</th><th>Título</th><th>Categoria</th>
+            <th>Ano</th><th>Destaque</th><th>URL do Vídeo</th><th>Ações</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- TROCA DE DOMÍNIO -->
+  <section id="sec-dominios" class="sec">
+    <h1><i class="fa-solid fa-link"></i> Trocar domínio em massa</h1>
+    <p class="desc">
+      Substitui uma parte do domínio em <strong>todas</strong> as <code>video_url</code>.
+      Exemplo: trocar <code>www.dominio-atual.com</code> por <code>www.dominio-novo.com</code>.
+      O resto do link (path, query, server=RCS…) fica intacto.
+    </p>
+
+    <div class="form-dominio">
+      <label>Domínio / trecho ANTIGO</label>
+      <input type="text" id="domAntigo" placeholder="www.dominio-atual.com" list="listaDominios">
+      <datalist id="listaDominios"></datalist>
+
+      <label>Domínio / trecho NOVO</label>
+      <input type="text" id="domNovo" placeholder="www.dominio-novo.com">
+
+      <div class="botoes">
+        <button class="btn-outline" onclick="previewDominio()"><i class="fa-regular fa-eye"></i> Pré-visualizar</button>
+        <button class="btn-primary" onclick="aplicarDominio()"><i class="fa-solid fa-check"></i> Aplicar em massa</button>
+      </div>
+    </div>
+
+    <div id="previewDominio" class="preview"></div>
+  </section>
+
+  <!-- USUÁRIOS -->
+  <section id="sec-usuarios" class="sec">
+    <h1><i class="fa-solid fa-users"></i> Usuários</h1>
+    <div class="tabela-wrap">
+      <table id="tabelaUsuarios">
+        <thead>
+          <tr><th>ID</th><th>Nome</th><th>Email</th><th>Admin</th><th>Criado</th><th>Ações</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============ MODAL CONTEÚDO ============ -->
+<div class="modal-overlay" id="modalConteudo" onclick="fecharModalConteudo(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <button class="fechar" aria-label="Fechar" onclick="fecharModalConteudo()"><i class="fa-solid fa-xmark"></i></button>
+    <h2 id="modalTitulo">Novo Conteúdo</h2>
+    <form id="formConteudo" onsubmit="salvarConteudo(event)">
+      <input type="hidden" id="fId">
+      <div class="campo"><label>Título *</label><input id="fTitulo" required></div>
+      <div class="campo"><label>Descrição</label><textarea id="fDescricao" rows="3"></textarea></div>
+      <div class="linha">
+        <div class="campo"><label>Categoria</label><input id="fCategoria"></div>
+        <div class="campo"><label>Ano</label><input type="number" id="fAno"></div>
+        <div class="campo"><label>Duração</label><input id="fDuracao" placeholder="ex: 1h 30min"></div>
+      </div>
+      <div class="campo"><label>URL da Capa</label><input id="fCapa"></div>
+      <div class="campo"><label>URL do Vídeo *</label><input id="fVideoUrl" required></div>
+      <div class="campo checkbox"><label><input type="checkbox" id="fDestaque"> Destaque na Home</label></div>
+      <p class="erro" id="erroConteudo"></p>
+      <div class="botoes">
+        <button type="button" class="btn-outline" onclick="fecharModalConteudo()">Cancelar</button>
+        <button type="submit" class="btn-primary">Salvar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="/static/js/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+bentv/
+├── app.py
+├── database.py
+├── requirements.txt
+├── bentv.db (criado automaticamente)
+├── static/
+│   ├── css/style.css
+│   ├── js/app.js
+│   └── videos/ (coloque seus .mp4 aqui)
+│   └── img/ (capas dos filmes)
+└── templates/
+    └── index.html

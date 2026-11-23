@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#202020">
+<title>Assistir — RedeCanais Jr</title>
+<link rel="icon" href="/static/images/favicon.ico">
+<link rel="apple-touch-icon" href="/static/images/apple-touch-icon.png">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="pagina-player">
+<header class="topbar player-topbar">
+  <a class="brand" href="/" aria-label="RedeCanais Jr - início">
+    <img src="/static/images/logo.webp" alt="RedeCanais Jr">
+  </a>
+  <a class="voltar-home" href="/"><i class="fa-solid fa-arrow-left"></i><span>Voltar ao catálogo</span></a>
+  <div class="user-area" id="userArea">
+    <button class="btn-outline" onclick="window.location.href='/?auth=login'">Entrar</button>
+  </div>
+</header>
+
+<main class="player-page">
+  <div class="player-main">
+    <div class="player-loading" id="playerLoading">
+      <span class="loading-spinner"></span>
+      <p>Preparando sua reprodução...</p>
+    </div>
+    <div class="player-error" id="playerError" hidden>
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <p>Não foi possível carregar este conteúdo.</p>
+      <a href="/">Voltar ao catálogo</a>
+    </div>
+    <section class="video-shell" id="videoShell" hidden>
+      <div class="video-stage" id="videoStage"></div>
+      <div class="video-details">
+        <div class="video-heading">
+          <div>
+            <p class="eyebrow"><span></span> AGORA A ASSISTIR</p>
+            <h1 id="playerTitulo"></h1>
+          </div>
+          <button class="favorite-action" id="btnFavoritar" hidden>
+            <i class="fa-regular fa-heart"></i><span>Favoritar</span>
+          </button>
+        </div>
+        <div class="player-meta" id="playerMeta"></div>
+        <p class="player-description" id="playerDescricao"></p>
+      </div>
+    </section>
+  </div>
+
+  <aside class="recommendations">
+    <div class="recommendations-heading">
+      <div>
+        <p class="eyebrow">SELEÇÃO PARA VOCÊ</p>
+        <h2>Você também pode gostar</h2>
+      </div>
+      <span class="recommendation-count" id="recommendationCount"></span>
+    </div>
+    <div class="recommendation-list" id="recommendationList"></div>
+  </aside>
+</main>
+<script>window.PLAYER_CONTENT_ID = {{ conteudo_id|tojson }};</script>
+<script src="/static/js/player.js"></script>
+</body>
+</html>
